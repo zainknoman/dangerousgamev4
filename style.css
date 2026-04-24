@@ -1,0 +1,1500 @@
+/* ═══════════════════════════════════════════════════════════════════
+   ▒ ▒ ▒ D A N G E R O U S  G A M E ▒ ▒ ▒ — style.css
+   Retro DOS / CRT terminal aesthetic
+   ═══════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* ── Reset & Root ──────────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --crt-green:  #00ff41;
+  --crt-amber:  #ffb000;
+  --crt-red:    #ff2020;
+  --crt-cyan:   #00ffff;
+  --crt-blue:   #4488ff;
+  --bg-dark:    #070a0f;
+  --bg-panel:   #0a0d1a;
+  --bg-sidebar: #080b14;
+  --border-glow:#1a1a3e;
+  --shadow-glow: rgba(0, 255, 65, 0.18);
+}
+
+/* ── Base ─────────────────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-dark);
+  color: var(--crt-green);
+  font-family: 'Press Start 2P', monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  overflow-x: hidden;
+  image-rendering: pixelated;
+  user-select: none;
+}
+
+/* ── CRT Scanlines Overlay ────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.06) 2px,
+    rgba(0, 0, 0, 0.06) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── CRT Vignette ─────────────────────────────────────────────── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.65) 100%);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SCREEN MANAGEMENT
+   ════════════════════════════════════════════════════════════════ */
+.screen {
+  display: none;
+  width: 100%;
+  max-width: 960px;
+  padding: 16px;
+  flex-direction: column;
+  align-items: center;
+}
+.screen.active {
+  display: flex;
+}
+
+
+
+
+/* ════════════════════════════════════════════════════════════════
+   MENU SCREEN
+   ════════════════════════════════════════════════════════════════ */
+#screen-menu {
+  gap: 0;
+}
+
+.menu-logo-wrap {
+  text-align: center;
+  margin: 30px 0 8px;
+}
+
+.menu-title {
+  font-size: clamp(10px, 3.5vw, 32px);
+  color: var(--crt-amber);
+  text-shadow:
+    0 0 12px var(--crt-amber),
+    0 0 30px rgba(255, 176, 0, 0.5),
+    0 0 60px rgba(255, 176, 0, 0.2);
+  letter-spacing: clamp(1px, 0.5vw, 4px);
+  word-break: break-word;
+  animation: flicker 5s infinite;
+  line-height: 1.4;
+}
+
+.menu-sub {
+  font-size: 8px;
+  color: #666;
+  letter-spacing: 5px;
+  margin-top: 6px;
+  margin-bottom: 24px;
+}
+
+.menu-canvas-wrap {
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 24px rgba(0,100,255,0.08);
+  margin-bottom: 28px;
+}
+
+.menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* ── 3-column retro grid menu ────────────────────────────────── */
+.menu-grid {
+  display: grid !important;
+  flex-direction: unset !important;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: min(600px, 92vw);
+  align-items: stretch;
+  padding: 0 4px;
+}
+
+.menu-btn-lg {
+  font-size: 8px !important;
+  padding: 14px 8px !important;
+  letter-spacing: 0.05em;
+}
+.menu-btn-md {
+  font-size: 7px !important;
+  padding: 10px 6px !important;
+}
+.menu-btn-sm {
+  font-size: 6px !important;
+  padding: 8px 4px !important;
+}
+.menu-btn-spacer {
+  visibility: hidden;
+}
+
+.btn-teal   { --btn-color: #00e5cc; }
+
+.dg-hiscore { display: inline-flex; align-items: center; gap: 10px; margin-top: 24px; background: #050f05; border: 1px solid #1e3a1e; border-radius: 4px; padding: 6px 18px; font-family: 'Courier New', monospace; }
+.dg-hi-label { font-size: 9px; color: #3d6b3d; letter-spacing: 0.14em; text-transform: uppercase; }
+.dg-hi-divider { width: 1px; height: 14px; background: #1e3a1e; }
+.dg-hi-score { font-size: 13px; font-weight: bold; color: #FF0000; letter-spacing: 0.1em; }
+
+
+/* ════════════════════════════════════════════════════════════════
+   GAME CONTROL DISPLAY
+   ════════════════════════════════════════════════════════════════ */
+
+/* THEME-2 - SHOW IN FOOTER */
+.dg-footer { width: 100%; font-family: 'Courier New', monospace; box-sizing: border-box; }
+.dg-mission { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 5px 12px; background: #030a03; border: 1px solid #1e3a1e; border-bottom: none; border-radius: 4px 4px 0 0; }
+.dg-mstep { font-size: 9px; color: #CCFF00; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
+.dg-micon { font-size: 11px; }
+.dg-marrow { color: #2a4a2a; font-size: 11px; }
+.dg-controls { display: flex; align-items: center; justify-content: space-between; background: #050f05; border: 1px solid #1e3a1e; border-radius: 0 0 4px 4px; padding: 6px 12px; gap: 4px; }
+.dg-ctrl { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+.dg-label { font-size: 8px; color: #3d6b3d; text-transform: uppercase; letter-spacing: 0.1em; }
+.dg-keys { display: flex; gap: 3px; align-items: center; }
+.dg-key { display: inline-flex; align-items: center; justify-content: center; background: #0a180a; border: 1px solid #2a4e2a; border-bottom: 2px solid #1a3a1a; border-radius: 4px; padding: 2px 6px; font-size: 9px; font-weight: bold; font-family: 'Courier New', monospace; color: #CCFF00; min-width: 20px; text-align: center; line-height: 1.4; }
+.dg-sep { font-size: 9px; color: #2a4a2a; }
+.dg-divider { width: 1px; height: 24px; background: #1e3a1e; flex-shrink: 0; }
+
+/* ── Animations ──────────────────────────────────────────────── */
+@keyframes flicker {
+  0%, 90%, 100% { opacity: 1; }
+  91% { opacity: 0.85; }
+  92% { opacity: 1; }
+  95% { opacity: 0.7; }
+  96% { opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { text-shadow: 0 0 12px var(--crt-amber), 0 0 30px rgba(255,176,0,0.4); }
+  50%       { text-shadow: 0 0 20px var(--crt-amber), 0 0 50px rgba(255,176,0,0.7); }
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   BUTTONS
+   ════════════════════════════════════════════════════════════════ */
+/* ===== BUTTON SYSTEM (RETRO NEON) ===== */
+.btn {
+  --btn-color: var(--crt-green);
+
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  padding: 13px 36px;
+  background: transparent;
+  border: 2px solid var(--btn-color);
+  color: var(--btn-color);
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: all 0.08s ease;
+  position: relative;
+  text-transform: uppercase;
+  outline: none;
+}
+
+/* outer glow frame */
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 1px solid transparent;
+  transition: border-color 0.08s;
+}
+
+/* hover = dynamic glow */
+.btn:hover {
+  background: color-mix(in srgb, var(--btn-color) 8%, transparent);
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--btn-color) 35%, transparent),
+    inset 0 0 12px color-mix(in srgb, var(--btn-color) 8%, transparent);
+  color: #ffffff;
+}
+
+.btn:hover::after {
+  border-color: color-mix(in srgb, var(--btn-color) 35%, transparent);
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+/* ===== COLOR VARIANTS ===== */
+.btn-green  { --btn-color: var(--crt-green); }
+.btn-amber  { --btn-color: var(--crt-amber); }
+.btn-red    { --btn-color: var(--crt-red); }
+.btn-cyan   { --btn-color: #00e5ff; }
+.btn-purple { --btn-color: #aa44ff; }
+.btn-yellow { --btn-color: #ffb000; }
+.btn-admin  { --btn-color: #8888ff; }
+
+.btn-primary {
+  animation: pulseGlow 1.5s infinite alternate;
+}
+
+@keyframes pulseGlow {
+  from { box-shadow: 0 0 8px var(--btn-color); }
+  to   { box-shadow: 0 0 22px var(--btn-color); }
+}
+
+.btn-locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* size */
+.btn-sm {
+  font-size: 8px;
+  padding: 8px 18px;
+
+
+
+}
+/* ════════════════════════════════════════════════════════════════
+   GAME SCREEN
+   ════════════════════════════════════════════════════════════════ */
+#screen-game {
+  padding: 12px;
+  gap: 0;
+}
+
+/* ── HUD Bar ─────────────────────────────────────────────────── */
+#hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  padding: 7px 14px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-glow);
+  border-bottom: none;
+  font-size: 8px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hud-group {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.hud-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.hud-item label {
+  color: #3a3a5a;
+  font-size: 6px;
+  letter-spacing: 1px;
+}
+
+.hud-item span {
+  color: var(--crt-amber);
+  font-size: 8px;
+}
+
+.hud-lives  { color: var(--crt-red) !important; }
+.hud-key    { color: #ddaa00 !important; }
+.hud-weapon { color: var(--crt-cyan) !important; }
+.hud-ammo   { color: #88aaff !important; }
+
+/* ── Jetpack fuel bar ────────────────────────────────────────── */
+#hud-jetbar-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+#hud-jetbar-wrap label {
+  font-size: 6px;
+  color: #3a3a5a;
+  letter-spacing: 1px;
+}
+#hud-jetbar {
+  width: 60px;
+  height: 6px;
+  background: #111;
+  border: 1px solid #222;
+  position: relative;
+  overflow: hidden;
+}
+#hud-jetbar-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #ff4400, #ffcc00);
+  transition: width 0.1s;
+}
+
+/* ── Phase 1: Boss HP Bar ───────────────────────── */
+#hud-boss-wrap { animation: boss-pulse 0.8s infinite; }
+#hud-boss-wrap.boss2 { animation: boss2-pulse 0.5s infinite; }
+@keyframes boss2-pulse {
+  0%,100% { box-shadow: 0 0 8px rgba(255,0,170,0.4); }
+  50%      { box-shadow: 0 0 20px rgba(255,0,170,0.9); }
+}
+@keyframes boss-pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+#hud-boss-label {
+  color: var(--crt-red) !important;
+  font-size: 6px;
+  text-shadow: 0 0 8px var(--crt-red);
+  white-space: nowrap;
+}
+#hud-boss-bar {
+  width: 80px; height: 8px;
+  background: #220000;
+  border: 1px solid #ff2020;
+  box-shadow: 0 0 8px rgba(255,32,32,0.5);
+  overflow: hidden;
+}
+#hud-boss-fill {
+  height: 100%; width: 100%;
+  background: linear-gradient(to right, #881100, #ff2020);
+  transition: width 0.15s, background 0.3s;
+}
+
+/* ── Canvas wrapper ──────────────────────────────────────────── */
+#canvas-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  border: 2px solid var(--border-glow);
+  box-shadow: 0 0 40px rgba(0,80,255,0.08), inset 0 0 80px rgba(0,0,20,0.7);
+  image-rendering: pixelated;
+  line-height: 0;
+  aspect-ratio: 800 / 320;  /* preserve game proportions */
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;        /* scale canvas to container */
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ── Message overlay ─────────────────────────────────────────── */
+#msg-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--crt-amber);
+  text-shadow: 0 0 20px var(--crt-amber);
+  pointer-events: none;
+  text-align: center;
+  line-height: 2;
+  background: rgba(0, 0, 0, 0.52);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+#msg-overlay.visible { opacity: 1; }
+
+/* ── Controls strip ──────────────────────────────────────────── */
+#controls-hint {
+  width: 100%;
+  max-width: 800px;
+  font-size: 7px;
+  color: #2a2a44;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 14px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-glow);
+  border-top: none;
+}
+#controls-hint span { color: #3a3a5a; }
+
+/* ════════════════════════════════════════════════════════════════
+   GAME OVER SCREEN
+   ════════════════════════════════════════════════════════════════ */
+#screen-gameover {
+  gap: 0;
+}
+
+.gameover-title {
+  font-size: 26px;
+  color: var(--crt-red);
+  text-shadow: 0 0 30px var(--crt-red), 0 0 60px rgba(255,32,32,0.4);
+  margin: 60px 0 28px;
+  animation: flicker 2s infinite;
+}
+
+.gameover-score {
+  font-size: 12px;
+  color: var(--crt-amber);
+  margin-bottom: 8px;
+}
+.gameover-hi {
+  font-size: 10px;
+  color: #555;
+  margin-bottom: 48px;
+}
+
+/* ── Win screen ──────────────────────────────────────────────── */
+.win-title {
+  font-size: 22px;
+  color: var(--crt-green);
+  text-shadow: 0 0 30px var(--crt-green);
+  margin: 50px 0 24px;
+  animation: pulse 1.5s infinite;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   EDITOR SCREEN  —  top-toolbar layout
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── screen-editor overrides default .screen centering ───────── */
+#screen-editor {
+  max-width: 100%;
+  padding: 10px 16px;
+  align-items: stretch;
+}
+
+/* ── Top action bar ──────────────────────────────────────────── */
+#editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-glow);
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+#editor-header h2 {
+  font-size: 11px;
+  color: var(--crt-amber);
+}
+#editor-header .ed-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* ── Toolbar: 3-zone row above canvas ────────────────────────── */
+#editor-toolbar {
+  display: flex;
+  gap: 0;
+  width: 100%;
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border-glow);
+  margin-bottom: 6px;
+  align-items: stretch;
+}
+
+/* shared zone chrome */
+.ed-zone {
+  padding: 8px 12px;
+  border-right: 1px solid var(--border-glow);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ed-zone:last-child { border-right: none; }
+
+.ed-zone-label {
+  font-size: 7px;
+  color: #39FF14;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #1a1a2e;
+  white-space: nowrap;
+}
+
+/* Zone 1 – Level select */
+#ed-zone-level {
+  min-width: 130px;
+  flex-shrink: 0;
+  justify-content: flex-start;
+}
+
+/* Zone 2 – Tiles (grows to fill) */
+.ed-zone-tiles {
+  flex: 1;
+  min-width: 0;
+}
+
+/* inner row: palette left, tools+guide right */
+.ed-toolbar-tiles-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.tile-btn {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #1c1c2e;
+  cursor: pointer;
+  image-rendering: pixelated;
+  background: #0a0a12;
+  transition: border-color 0.08s;
+  border-radius: 0;
+}
+.tile-btn:hover    { border-color: #444; }
+.tile-btn.selected { border-color: var(--crt-green); box-shadow: 0 0 6px rgba(0,255,65,0.4); }
+
+/* right sub-column: CLEAR/FILL + guide */
+.ed-toolbar-tiles-right {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: flex-start;
+}
+
+.tile-label-inline {
+  font-size: 10px;
+  color: #FF8100;
+  letter-spacing: 0;
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* Zone 3 – Characters */
+#ed-zone-chars {
+  min-width: 180px;
+  flex-shrink: 0;
+}
+
+/* ── Level select ───────────────────────────────────────────── */
+#ed-level-select {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  background: var(--bg-panel);
+  color: var(--crt-amber);
+  border: 1px solid var(--border-glow);
+  padding: 5px 8px;
+  width: 100%;
+  cursor: pointer;
+}
+#ed-level-select option { background: var(--bg-panel); }
+
+/* ── Editor tools (inside toolbar) ──────────────────────────── */
+#editor-tools {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+
+/* ── Coords strip ───────────────────────────────────────────── */
+.ed-coords-bar {
+  width: 100%;
+  margin-bottom: 4px;
+}
+.ed-coords {
+  font-size: 6px;
+  color: #FFFF00;
+  min-height: 16px;
+  display: block;
+}
+
+/* ── Editor canvas — full width ─────────────────────────────── */
+#editor-canvas-wrap {
+  width: 100%;
+  overflow: auto;
+  border: 1px solid var(--border-glow);
+  cursor: crosshair;
+  background: #000;
+  max-height: calc(100vh - 280px);
+}
+#editorCanvas {
+  display: block;
+  image-rendering: pixelated;
+}
+
+/* ── Shared button style ─────────────────────────────────────── */
+.ed-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  padding: 6px 10px;
+  background: transparent;
+  border: 1px solid #2a2a3e;
+  color: #1F51FF;
+  cursor: pointer;
+  transition: all 0.08s;
+  outline: none;
+}
+.ed-btn:hover  { border-color: var(--crt-white); color: var(--crt-red); }
+.ed-btn.active { border-color: var(--crt-amber);  color: var(--crt-amber); }
+
+/* ── Characters zone internals ──────────────────────────────── */
+#char-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+
+.char-entry {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 6px;
+  border: 1px solid #1c1c2e;
+  cursor: pointer;
+  transition: border-color 0.08s;
+}
+.char-entry:hover  { border-color: #444; }
+.char-entry.active { border-color: var(--crt-green); }
+.char-swatch { width: 14px; height: 14px; flex-shrink: 0; border: 1px solid #333; image-rendering: pixelated; }
+.char-label  { font-size: 6px; color: #888; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.char-del    { font-size: 9px; color: #553; cursor: pointer; padding: 0 3px; }
+.char-del:hover { color: var(--crt-red); }
+
+/* ── Custom character modal ──────────────────────────────────── */
+#char-modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+}
+#char-modal-bg.open { display: flex; }
+
+#char-modal {
+  background: var(--bg-panel);
+  border: 2px solid var(--crt-amber);
+  padding: 22px;
+  min-width: 300px;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 0 40px rgba(255,176,0,0.2);
+}
+#char-modal h2 {
+  font-size: 10px;
+  color: var(--crt-amber);
+  margin-bottom: 18px;
+}
+
+.cf { margin-bottom: 11px; }
+.cf label {
+  display: block;
+  font-size: 6px;
+  color: #555;
+  margin-bottom: 5px;
+  letter-spacing: 1px;
+}
+.cf input, .cf select {
+  font-family: inherit;
+  font-size: 7px;
+  background: #070a0f;
+  color: var(--crt-green);
+  border: 1px solid #2a2a3e;
+  padding: 5px 8px;
+  width: 100%;
+}
+.cf input[type=color]  { padding: 2px; height: 28px; cursor: pointer; }
+.cf input[type=range]  { padding: 0; height: 18px; accent-color: var(--crt-green); }
+.cf .rv { color: var(--crt-amber); margin-left: 6px; }
+
+.char-prev-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+#char-prev-cnv { border: 1px solid #2a2a3e; image-rendering: pixelated; }
+#char-prev-info { font-size: 6px; color: #555; line-height: 2.2; }
+
+.char-modal-btns {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   CONFIG PANEL (in-game settings accessible from menu)
+   ════════════════════════════════════════════════════════════════ */
+#config-badge {
+  position: fixed;
+  top: 10px;
+  right: 12px;
+  font-size: 6px;
+  color: #2a2a3e;
+  z-index: 100;
+  letter-spacing: 1px;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   MOBILE TOUCH CONTROLS
+   ════════════════════════════════════════════════════════════════ */
+#touch-controls {
+  display: none;
+  width: 100%;
+  max-width: 800px;
+  padding: 12px 10px calc(16px + env(safe-area-inset-bottom)); /* updated */
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-glow);
+  border-top: none;
+}
+
+.touch-btn {
+  font-family: 'Press Start 2P', monospace;
+  width: 64px;        /* was 52px */
+  height: 64px;       /* was 52px */
+  font-size: 18px;    /* bigger arrow symbols */
+  border-radius: 8px;
+  border: 2px solid #2a4a2a;
+  background: rgba(0,255,65,0.08);
+  color: #446644;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: background 0.05s, transform 0.05s;
+  user-select: none;
+}
+
+.touch-btn:active,
+.touch-btn.pressed {
+  background: rgba(0,255,65,0.25);
+  border-color: var(--crt-green);
+  color: var(--crt-green);
+  transform: scale(0.93);
+}
+.touch-dpad { display: flex; gap: 4px; }
+.touch-actions { display: flex; gap: 8px; }
+
+@media (hover: none) and (pointer: coarse) {
+  /* Any touch device — phone or tablet */
+  #touch-controls { display: flex; }
+  #controls-hint span { display: none; } /* hide keyboard hint on touch */
+}
+@media (max-width: 600px) {
+  .menu-title { font-size: 18px; }
+  #hud { font-size: 6px; }
+  #controls-hint {
+    padding: 4px 8px;
+  }
+  #controls-hint span {
+    display: none;
+  }
+}
+@media (max-width: 400px) {
+  .menu-title { font-size: 13px; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   GLOBAL FOOTER BAR
+   Fixed to bottom — always visible on all screens
+   ════════════════════════════════════════════════════════════════ */
+#footer-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 38px;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border-glow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 9000;
+  /* slight glow along the top edge */
+  box-shadow: 0 -1px 12px rgba(0, 255, 65, 0.06);
+}
+
+/* Left zone — admin link */
+.footer-left  { flex: 1; display: flex; align-items: center; }
+/* Center zone — game title tag */
+.footer-center { flex: 1; display: flex; justify-content: center; }
+/* Right zone — fullscreen */
+.footer-right  { flex: 1; display: flex; justify-content: flex-end; align-items: center; }
+
+/* ── Admin link ──────────────────────────────────────────────── */
+.footer-link {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #FFDE21;
+  text-decoration: none;
+  padding: 5px 10px;
+  border: 1px solid transparent;
+  letter-spacing: 1.5px;
+  transition: color 0.15s, border-color 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+}
+.footer-link-icon {
+  font-size: 12px;
+  line-height: 1;
+  transition: transform 0.3s;
+}
+.footer-link:hover {
+  color: var(--crt-amber);
+  border-color: rgba(255, 176, 0, 0.25);
+  box-shadow: 0 0 10px rgba(255, 176, 0, 0.12);
+}
+.footer-link:hover .footer-link-icon {
+  transform: rotate(60deg);
+}
+
+/* ── Center game tag ─────────────────────────────────────────── */
+.footer-game-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: #CCFF00;
+  letter-spacing: 3px;
+  white-space: nowrap;
+}
+.footer-game-tag-developer {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #00FFFF;
+  letter-spacing: 5px;
+
+  /* Stacked shadows for glowing effect */
+  text-shadow: 
+    0 0 5px #00FFFF, 
+    0 0 10px #00FFFF, 
+    0 0 20px #00FFFF;
+}
+
+/* ── Fullscreen button ───────────────────────────────────────── */
+.btn-fullscreen {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid #1a2a1a;
+  color: #FFDE21;
+  cursor: pointer;
+  letter-spacing: 1.5px;
+  transition: color 0.15s, border-color 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+  outline: none;
+}
+.fs-icon {
+  font-size: 13px;
+  line-height: 1;
+  font-style: normal;
+  transition: transform 0.2s;
+}
+.btn-fullscreen:hover {
+  color: var(--crt-green);
+  border-color: rgba(0, 255, 65, 0.3);
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.12);
+}
+.btn-fullscreen:active {
+  transform: scale(0.96);
+}
+
+/* Active fullscreen state — button swaps to EXIT style */
+.btn-fullscreen.is-fullscreen {
+  color: var(--crt-amber);
+  border-color: rgba(255, 176, 0, 0.3);
+}
+.btn-fullscreen.is-fullscreen:hover {
+  box-shadow: 0 0 10px rgba(255, 176, 0, 0.18);
+}
+
+/* Push all screen content up so footer doesn't overlap bottom */
+body {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ── Admin button on menu screen ────────────────────────────── */
+.btn-admin {
+  border-color: rgba(255, 176, 0, 0.35);
+  color: rgba(255, 176, 0, 0.65);
+  font-size: 9px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn-admin:hover {
+  background: rgba(255, 176, 0, 0.07);
+  border-color: var(--crt-amber);
+  color: var(--crt-amber);
+  box-shadow: 0 0 16px rgba(255, 176, 0, 0.25);
+}
+
+/* ── Hide footer label on very small screens ─────────────────── */
+@media (max-width: 420px) {
+  .footer-link-text,
+  .fs-label,
+  .footer-game-tag { display: none; }
+  #footer-bar { padding: 0 10px; }
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #070a0f; }
+::-webkit-scrollbar-thumb { background: #1a1a3e; }
+::-webkit-scrollbar-thumb:hover { background: #2a2a5e; }
+
+/* ════════════════════════════════════════════════════════════════
+   EXTRACTED FROM INLINE STYLES
+   Every rule here replaces a removed inline style="" attribute.
+   ════════════════════════════════════════════════════════════════ */
+
+/* #menu-canvas — was: style="image-rendering:pixelated;display:block;" */
+#menu-canvas {
+  image-rendering: pixelated;
+  display: block;
+}
+
+/* Touch button colour variants
+   was: style="font-size:8px;"  /  style="border-color:...;color:..." */
+.touch-grenade {
+  font-size: 8px;
+}
+.touch-shoot {
+  border-color: #4488ff;
+  color: #4488ff;
+}
+.touch-jump {
+  border-color: var(--crt-amber);
+  color: var(--crt-amber);
+}
+
+/* Hidden file input — was: style="display:none" */
+.hidden-file-input {
+  display: none;
+}
+
+/* Editor "add character" button
+   was: style="width:100%;border-color:var(--crt-amber);color:var(--crt-amber);" */
+.ed-btn-add-char {
+  width: 100%;
+  border-color: var(--crt-amber);
+  color: var(--crt-amber);
+}
+.ed-btn-add-char:hover {
+  background: rgba(255, 176, 0, 0.08);
+}
+
+/* Editor danger/back button — was: class="btn-danger" mixed onto ed-btn */
+.ed-btn-danger {
+  border-color: var(--crt-red);
+  color: var(--crt-red);
+}
+.ed-btn-danger:hover {
+  border-color: var(--crt-red);
+  color: #fff;
+  background: rgba(255, 32, 32, 0.08);
+}
+
+/* Character modal colour row — was: style="display:flex;gap:10px" */
+.cf-row {
+  display: flex;
+  gap: 10px;
+}
+
+/* Half-width colour field — was: style="flex:1" */
+.cf-half {
+  flex: 1;
+}
+
+/* Character preview canvas — was: style="width:48px;height:56px;" */
+.char-prev-canvas {
+  width: 48px;
+  height: 56px;
+  image-rendering: pixelated;
+}
+
+/* Character save button
+   was: style="border-color:var(--crt-amber);color:var(--crt-amber);" */
+.ed-btn-save {
+  border-color: var(--crt-amber);
+  color: var(--crt-amber);
+}
+.ed-btn-save:hover {
+  background: rgba(255, 176, 0, 0.08);
+  color: #fff;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   LEVEL TRANSITION SCREEN
+   Full-screen animated corridor walk between levels.
+════════════════════════════════════════════════════════════════ */
+#screen-transition {
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 40px);
+  background: var(--bg-dark, #070a0f);
+  padding: 0;
+}
+
+#trans-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 780px;
+  padding: 0 16px;
+}
+
+/* ── Header row: "LEVEL 1" ···msg··· "LEVEL 2" ── */
+#trans-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  padding: 0 4px;
+}
+
+#trans-level-from {
+  color: #00cc33;
+  text-shadow: 0 0 10px rgba(0,204,51,0.7);
+  letter-spacing: 2px;
+}
+
+#trans-message {
+  color: #ffb000;
+  text-shadow: 0 0 10px rgba(255,176,0,0.7);
+  letter-spacing: 2px;
+  text-align: center;
+  flex: 1;
+  padding: 0 12px;
+  animation: trans-msg-pulse 1s infinite;
+}
+
+@keyframes trans-msg-pulse {
+  0%,100% { opacity:1; }
+  50%      { opacity:0.65; }
+}
+
+#trans-level-to {
+  color: #00e5ff;
+  text-shadow: 0 0 10px rgba(0,229,255,0.7);
+  letter-spacing: 2px;
+  text-align: right;
+}
+
+/* ── Corridor canvas wrapper ── */
+#trans-corridor-wrap {
+  border: 2px solid #1a3020;
+  box-shadow:
+    0 0 32px rgba(0,255,65,0.08),
+    inset 0 0 40px rgba(0,0,0,0.6);
+  width: 100%;
+  max-width: 700px;
+  line-height: 0;
+}
+
+#trans-canvas {
+  display: block;
+  width: 100%;
+  image-rendering: pixelated;
+}
+
+/* ── Footer row: score + sub-message ── */
+#trans-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+}
+
+#trans-score-label {
+  color: #3a3a5a;
+  letter-spacing: 2px;
+}
+
+#trans-score-val {
+  color: #ffb000;
+  text-shadow: 0 0 8px rgba(255,176,0,0.5);
+  letter-spacing: 1px;
+}
+
+#trans-sub {
+  color: #3a5a4a;
+  font-size: 7px;
+  letter-spacing: 2px;
+  animation: trans-msg-pulse 1.4s infinite;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   EMOJI TILE PALETTE (level editor)
+════════════════════════════════════════════════════════════════ */
+.tile-btn-emoji {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 2px solid var(--border, #1a1a3e);
+  cursor: pointer;
+  transition: border-color 0.08s, box-shadow 0.08s;
+  border-radius: 0;
+  padding: 2px;
+  position: relative;
+  gap: 1px;
+  font-family: 'Press Start 2P', monospace;
+}
+
+.tile-btn-emoji:hover  { border-color: #446644; }
+.tile-btn-emoji.selected {
+  border-color: var(--crt-green, #00ff41);
+  box-shadow: 0 0 8px rgba(0,255,65,0.45);
+}
+
+.tile-icon {
+  font-size: 14px;
+  line-height: 1;
+  display: block;
+  text-align: center;
+}
+
+.tile-id-badge {
+  font-size: 5px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0;
+  line-height: 1;
+  position: absolute;
+  bottom: 2px;
+  right: 3px;
+}
+
+.tile-name-badge {
+  font-size: 4px;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0;
+  line-height: 1;
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  max-width: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* cyan button variant */
+.btn-cyan {
+  border-color: rgba(0,229,255,0.5);
+  color: #00e5ff;
+}
+.btn-cyan:hover {
+  background: rgba(0,229,255,0.07);
+  border-color: #00e5ff;
+  color: #fff;
+  box-shadow: 0 0 18px rgba(0,229,255,0.3);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   LEADERBOARD SCREEN
+════════════════════════════════════════════════════════════════ */
+#screen-leaderboard {
+  gap: 0;
+  align-items: center;
+}
+
+.lb-header {
+  text-align: center;
+  margin: 48px 0 32px;
+}
+
+.lb-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 28px;
+  color: #ffb000;
+  text-shadow: 0 0 20px rgba(255,176,0,0.7), 0 0 50px rgba(255,176,0,0.3);
+  letter-spacing: 4px;
+  margin-bottom: 10px;
+  animation: flicker 4s infinite;
+}
+
+.lb-subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #4a7060;
+  letter-spacing: 6px;
+}
+
+.lb-table-wrap {
+  width: 100%;
+  max-width: 600px;
+  border: 1px solid #1a3020;
+  box-shadow: 0 0 30px rgba(0,255,65,0.06);
+  margin-bottom: 32px;
+}
+
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Press Start 2P', monospace;
+}
+
+.lb-th {
+  font-size: 7px;
+  color: #7de8ff;
+  text-shadow: 0 0 6px rgba(0,229,255,0.4);
+  letter-spacing: 2px;
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid #1a3020;
+  background: rgba(0,255,65,0.03);
+}
+
+.lb-table tbody tr {
+  border-bottom: 1px solid #0f2010;
+  animation: fadein 0.3s ease;
+}
+.lb-table tbody tr:last-child { border-bottom: none; }
+.lb-table tbody tr:hover td { background: rgba(0,255,65,0.04); }
+
+.lb-table td {
+  font-size: 9px;
+  padding: 10px 14px;
+  color: #7de8a0;
+}
+
+.lb-rank   { font-size: 12px; text-align: center; width: 60px; }
+.lb-name   { color: #00ff41; text-shadow: 0 0 8px rgba(0,255,65,0.4); letter-spacing: 2px; }
+.lb-score  { color: #ffb000; text-shadow: 0 0 8px rgba(255,176,0,0.4); text-align: right; font-size: 10px; }
+.lb-date   { color: #4a7060; font-size: 7px; text-align: right; }
+
+/* Medal row highlights */
+.lb-gold   td { background: rgba(255,215,0,0.06); }
+.lb-gold   .lb-score { color: #ffd700; text-shadow: 0 0 12px rgba(255,215,0,0.6); }
+.lb-silver td { background: rgba(192,192,192,0.04); }
+.lb-bronze td { background: rgba(205,127,50,0.04); }
+
+.lb-empty {
+  text-align: center;
+  color: #4a7060;
+  font-size: 8px;
+  padding: 32px 0;
+  letter-spacing: 2px;
+}
+
+.lb-actions {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   HIGH SCORE ENTRY MODAL  (name input after new record)
+════════════════════════════════════════════════════════════════ */
+.hs-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 20000;
+  align-items: center;
+  justify-content: center;
+}
+.hs-modal-overlay.open { display: flex; }
+
+.hs-modal-box {
+  background: #0c141a;
+  border: 2px solid #ffb000;
+  box-shadow: 0 0 60px rgba(255,176,0,0.25), 0 0 0 1px rgba(255,176,0,0.1);
+  padding: 36px 40px;
+  max-width: 420px;
+  width: 92%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  animation: fadein 0.25s ease;
+}
+
+.hs-modal-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+  color: #ffb000;
+  text-shadow: 0 0 20px rgba(255,176,0,0.7);
+  letter-spacing: 3px;
+  animation: flicker 3s infinite;
+}
+
+.hs-modal-score {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 26px;
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255,215,0,0.6);
+  letter-spacing: 4px;
+}
+
+.hs-modal-msg {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #7de8a0;
+  line-height: 2.2;
+  letter-spacing: 1px;
+}
+
+.hs-modal-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #7de8ff;
+  text-shadow: 0 0 6px rgba(0,229,255,0.4);
+  letter-spacing: 2px;
+  margin-top: 6px;
+}
+
+.hs-name-input {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+  background: #070d10;
+  border: 2px solid #00cc33;
+  color: #00ff41;
+  text-align: center;
+  letter-spacing: 6px;
+  padding: 12px 20px;
+  width: 100%;
+  outline: none;
+  text-transform: uppercase;
+  box-shadow: 0 0 16px rgba(0,255,65,0.15), inset 0 0 20px rgba(0,255,65,0.04);
+  transition: border-color 0.1s, box-shadow 0.1s;
+}
+.hs-name-input:focus {
+  border-color: #00ff41;
+  box-shadow: 0 0 24px rgba(0,255,65,0.3), inset 0 0 20px rgba(0,255,65,0.06);
+}
+.hs-name-input::placeholder { color: #1a4020; }
+
+.hs-modal-hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: #2a4030;
+  letter-spacing: 2px;
+}
+
+.hs-save-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  padding: 13px 36px;
+  background: transparent;
+  border: 2px solid #ffb000;
+  color: #ffb000;
+  cursor: pointer;
+  letter-spacing: 3px;
+  margin-top: 8px;
+  transition: all 0.1s;
+}
+.hs-save-btn:hover {
+  background: rgba(255,176,0,0.1);
+  box-shadow: 0 0 20px rgba(255,176,0,0.4);
+  color: #fff;
+}
+.hs-save-btn:active { transform: scale(0.97); }
+
+@keyframes fadein {
+  from { opacity:0; transform:translateY(-8px) scale(0.97); }
+  to   { opacity:1; transform:none; }
+}
+
+/* ── Tile Guide Panel ───────────────────────────────────────── */
+#ed-zone-guide {
+  min-width: 230px;
+  max-width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  padding-right: 4px;
+  flex-shrink: 0;
+}
+
+/* 3 GROUPS PER ROW */
+#tile-guide {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+/* GROUP BOX */
+.tg-group-box {
+  border: 1px solid #2a2a3e;
+  background: #0a0a12;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* GROUP HEADING */
+.tg-group-heading {
+  user-select: none;
+  font-size: 7px;
+}
+
+/* INNER TILE GRID */
+.tg-group-box > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+  gap: 3px;
+}
+
+/* TILE CELL */
+.tg-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 2px;
+  min-height: 40px;
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.1s, background 0.1s, box-shadow 0.1s;
+}
+.tg-cell:hover { filter: brightness(1.2); }
+.tg-cell.selected {
+  box-shadow: 0 0 8px rgba(0,255,65,0.55) !important;
+}

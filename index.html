@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>▒ DANGEROUS GAME ▒</title><!-- overwritten at runtime by game.config.json → game.title -->
+  <meta name="description" content="DANGEROUS GAME — retro 2D side-scrolling game">
+  <meta name="theme-color" content="#070a0f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="DG-favicon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Config version badge (top-right corner) -->
+<div id="config-badge">LOADING CONFIG…</div>
+
+<!-- ════════════════════════════════════════════
+     MENU SCREEN
+     ════════════════════════════════════════════ -->
+	 <div id="screen-menu" class="screen active">
+
+  <div class="menu-logo-wrap">
+    <div class="menu-title" data-config="game.title">
+      ▒ ▒ ▒ DANGEROUS GAME ▒ ▒ ▒
+    </div>
+    <div class="menu-sub" data-config="game.subtitle">
+      ▒ BUILD YOUR OWN GAME ▒
+    </div>
+  </div>
+
+  <div class="menu-canvas-wrap">
+    <canvas id="menu-canvas" width="500" height="96"></canvas>
+  </div>
+
+  <div class="menu-options menu-grid">
+    <!-- Row 1: Primary actions -->
+    <button class="btn btn-amber btn-primary menu-btn-lg" id="btn-play">▶ START MISSION</button>
+    <button class="btn btn-purple menu-btn-lg" id="btn-roguelite">💀 ROGUELITE</button>
+    <button class="btn btn-yellow menu-btn-lg" id="btn-daily">📅 DAILY</button>
+    <!-- Row 2: Tools -->
+    <button class="btn btn-green  menu-btn-md" id="btn-editor">✎ LEVEL EDITOR</button>
+    <button class="btn btn-cyan   menu-btn-md" id="btn-achievements">🏅 MEDALS</button>
+    <button class="btn btn-cyan   menu-btn-md" id="btn-leaderboard">🏆 SCORES</button>
+    <!-- Row 3: Share + Admin -->
+    <button class="btn btn-teal   menu-btn-sm" id="btn-import-level">🔗 PLAY SHARED</button>
+    <button class="btn btn-cyan   menu-btn-sm" id="btn-watch-shared-replay">👁 WATCH REPLAY</button>
+    <a      class="btn btn-admin  menu-btn-sm" href="admin.html">⚙ CONFIG</a>
+  </div>
+
+  <div class="dg-hiscore" id="menu-hi">
+    <span class="dg-hi-label">Hi-Score</span>
+    <div class="dg-hi-divider"></div>
+    <span class="dg-hi-score">0000000</span>
+  </div>
+	
+	<!-- THEME-2 - SHOW IN FOOTER -->
+	<div class="dg-footer">
+	  <div class="dg-mission">
+		<div class="dg-mstep"><span class="dg-micon">★</span> Collect all trophies</div>
+		<span class="dg-marrow">→</span>
+		<div class="dg-mstep"><span class="dg-micon">⚿</span> Find key</div>
+		<span class="dg-marrow">→</span>
+		<div class="dg-mstep"><span class="dg-micon">▭</span> Reach the door</div>
+	  </div>
+	  <div class="dg-controls">
+		<div class="dg-ctrl">
+		  <span class="dg-label">Move</span>
+		  <div class="dg-keys">
+			<span class="dg-key">←</span><span class="dg-key">→</span>
+			<span class="dg-sep">/</span>
+			<span class="dg-key">A</span><span class="dg-key">D</span>
+		  </div>
+		</div>
+		<div class="dg-divider"></div>
+		<div class="dg-ctrl">
+		  <span class="dg-label">Run</span>
+		  <div class="dg-keys"><span class="dg-key">Shift</span></div>
+		</div>
+		<div class="dg-divider"></div>
+		<div class="dg-ctrl">
+		  <span class="dg-label">Jump</span>
+		  <div class="dg-keys">
+			<span class="dg-key">Space</span><span class="dg-sep">/</span><span class="dg-key">↑</span>
+		  </div>
+		</div>
+		<div class="dg-divider"></div>
+		<div class="dg-ctrl">
+		  <span class="dg-label">Shoot</span>
+		  <div class="dg-keys">
+			<span class="dg-key">Ctrl</span><span class="dg-sep">/</span><span class="dg-key">Z</span>
+		  </div>
+		</div>
+		<div class="dg-divider"></div>
+		<div class="dg-ctrl">
+		  <span class="dg-label">Grenade</span>
+		  <div class="dg-keys">
+			<span class="dg-key">G</span><span class="dg-sep">/</span><span class="dg-key">X</span>
+		  </div>
+		</div>
+		<div class="dg-divider"></div>
+		<div class="dg-ctrl">
+		  <span class="dg-label">Menu</span>
+		  <div class="dg-keys"><span class="dg-key">Esc</span></div>
+		</div>
+	  </div>
+	</div>
+
+
+</div>
+
+<!-- ════════════════════════════════════════════
+     GAME SCREEN
+     ════════════════════════════════════════════ -->
+<div id="screen-game" class="screen">
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="hud-group">
+      <div class="hud-item">
+        <label>SCORE</label>
+        <span id="hud-score">0000000</span>
+      </div>
+      <div class="hud-item">
+        <label>HI</label>
+        <span id="hud-hi">0000000</span>
+      </div>
+      <div class="hud-item">
+        <label>MISSION</label>
+        <span id="hud-level">LV 1</span>
+      </div>
+    </div>
+    <div class="hud-group">
+      <div class="hud-item">
+        <label>LIVES</label>
+        <span class="hud-lives" id="hud-lives">♥♥♥</span>
+      </div>
+      <div class="hud-item">
+        <label>CUPS</label>
+        <span id="hud-trophy">0</span>
+      </div>
+      <div class="hud-item">
+        <label>KEY</label>
+        <span class="hud-key" id="hud-key">NO</span>
+      </div>
+      <div class="hud-item">
+        <label>WEAPON</label>
+        <span class="hud-weapon" id="hud-weapon">NONE</span>
+      </div>
+      <div class="hud-item">
+        <label>AMMO</label>
+        <span class="hud-ammo" id="hud-ammo">–</span>
+      </div>
+      <div class="hud-item">
+        <label>NADE</label>
+        <span id="hud-nade">x0</span>
+      </div>
+      <div class="hud-item" id="hud-jetbar-wrap">
+        <label>JET</label>
+        <div id="hud-jetbar"><div id="hud-jetbar-fill"></div></div>
+      </div>
+      <!-- Phase 1: Boss HP bar -->
+      <div class="hud-item" id="hud-boss-wrap" style="display:none">
+        <label id="hud-boss-label">BOSS 12/12</label>
+        <div id="hud-boss-bar"><div id="hud-boss-fill"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game canvas -->
+  <div id="canvas-wrapper">
+    <canvas id="gameCanvas"></canvas>
+    <div id="msg-overlay"></div>
+  </div>
+
+  <!-- Controls hint strip -->
+  <div id="controls-hint">
+    <span>← → MOVE &nbsp; SHIFT RUN &nbsp; SPACE JUMP &nbsp; CTRL/Z SHOOT &nbsp; G GRENADE</span>
+    <button class="btn btn-danger btn-sm" id="btn-menu" aria-label="Quit to menu">ESC / QUIT</button>
+  </div>
+
+  <!-- Touch controls (mobile only — shown via CSS media query) -->
+  <div id="touch-controls">
+    <div class="touch-dpad">
+      <button class="touch-btn"             id="touch-left">◀</button>
+      <button class="touch-btn"             id="touch-right">▶</button>
+    </div>
+    <div class="touch-actions">
+      <button class="touch-btn touch-grenade" id="touch-grenade">NADE</button>
+      <button class="touch-btn touch-shoot"   id="touch-shoot">FIRE</button>
+      <button class="touch-btn touch-jump"    id="touch-jump">JUMP</button>
+    </div>
+  </div>
+
+</div><!-- /screen-game -->
+
+<!-- ════════════════════════════════════════════
+     GAME OVER / WIN SCREEN
+     ════════════════════════════════════════════ -->
+<div id="screen-gameover" class="screen">
+  <div class="gameover-title" id="go-title">GAME OVER</div>
+  <div class="gameover-score">SCORE: <span id="go-score">0000000</span></div>
+  <div class="gameover-hi">HI-SCORE: <span id="go-hi">0000000</span></div>
+  <div class="menu-options">
+    <button class="btn btn-amber" id="btn-retry">▶ PLAY AGAIN</button>
+    <button class="btn btn-cyan"  id="btn-watch-replay" style="display:none">👁 WATCH REPLAY</button>
+    <button class="btn btn-cyan"  id="btn-export-replay" style="display:none">📤 SHARE REPLAY</button>
+    <div id="replay-export-feedback" style="display:none;color:#00ff88;font-family:'Press Start 2P',monospace;font-size:8px;margin-top:8px;text-align:center;"></div>
+    <button class="btn"           id="btn-gomenu">← MAIN MENU</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     EDITOR SCREEN
+     ════════════════════════════════════════════ -->
+<div id="screen-editor" class="screen">
+
+  <!-- Top bar: title + action buttons -->
+  <div id="editor-header">
+    <h2>◈ LEVEL EDITOR</h2>
+    <div class="ed-btns">
+      <button class="btn btn-green"               id="btn-ed-play">▶ PLAY TEST</button>
+      <button class="btn btn-cyan"               id="btn-ed-export">↓ EXPORT</button>
+      <button class="btn btn-amber"               id="btn-ed-import">↑ IMPORT</button>
+      <button class="btn btn-cyan"                id="btn-ed-share">🔗 SHARE LEVEL</button>
+      <button class="btn btn-purple"              id="btn-ed-ai">🤖 AI GENERATE</button>
+      <button class="btn btn-amber ed-btn-danger" id="btn-ed-menu">✕ BACK</button>
+      <input  class="hidden-file-input"    type="file" id="ed-import-input" accept=".json">
+    </div>
+  </div>
+
+  <!-- Toolbar: LEVEL | TILES palette+tools+guide | CHARACTERS -->
+  <div id="editor-toolbar">
+
+    <!-- Zone 1: Level select -->
+	<div class="tile-guide">
+		<div class="tg-group-heading" style="padding: 6px 10px 5px; margin: 8px 0px 4px; background: rgba(255, 136, 0, 0.094); border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgba(255, 136, 0, 0.333) rgba(255, 136, 0, 0.333) rgba(255, 136, 0, 0.333) rgb(255, 136, 0); border-image: initial; font-family: &quot;Press Start 2P&quot;, monospace; font-size: 12px; color: rgb(255, 136, 0); letter-spacing: 2px; display: flex; align-items: center; gap: 8px;">
+			<span style="font-size:13px">🗺️</span>
+			<div>
+				<div>LEVEL</div>
+				<div style="font-size:5px;color:#44cc4499;margin-top:2px;letter-spacing:1px">&nbsp;</div>
+			</div>
+			<select id="ed-level-select"></select>
+		</div>
+				
+		<!-- Zone 3: Add new character -->
+		<div class="tg-group-heading" style="padding: 6px 10px 5px; margin: 8px 0px 4px; background: rgba(255, 0, 68, 0.094); border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgba(255, 0, 68, 0.333) rgba(255, 0, 68, 0.333) rgba(255, 0, 68, 0.333) rgb(255, 0, 68); border-image: initial; font-family: &quot;Press Start 2P&quot;, monospace; font-size: 7px; color: rgb(255, 0, 68); letter-spacing: 2px; display: flex; align-items: center; gap: 8px;">
+			<span style="font-size:13px">⚔️➕</span>
+			<div>
+			  <button class="ed-btn ed-btn-add-char" id="btn-add-char">+ ADD CUSTOM ENEMY</button>
+			</div>
+		</div>
+	</div>
+	
+    <!-- Zone 4: Tile palette + tools + guide -->
+    <div class="ed-zone ed-zone-tiles" id="ed-zone-tiles">
+      <div class="ed-toolbar-tiles-row">
+		<!-- Zone 4: Tile Reference ← ADD THIS ENTIRE BLOCK -->
+		<div class="ed-zone" id="ed-zone-guide">		  
+			<div class="tile-guide">
+				<div class="tg-group-heading" style="padding: 6px 10px 5px; margin: 8px 0px 4px; background: rgba(68, 102, 255, 0.094); border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgba(68, 102, 255, 0.333) rgba(68, 102, 255, 0.333) rgba(68, 102, 255, 0.333) rgb(68, 102, 255); border-image: initial; font-family: &quot;Press Start 2P&quot;, monospace; font-size: 12px; color: rgb(68, 102, 255); letter-spacing: 2px; display: flex; align-items: center; gap: 8px;">
+					<span style="font-size:13px">🧰</span>
+					<div>Tiles Toolbox
+					</div>
+					
+					<div class="tg-cell" data-tid="4" title="[4] TROPHY — Collect all to unlock door" style="border: 1px solid rgba(255, 204, 0, 0.333); background: rgba(255, 204, 0, 0.07); display: flex; flex-direction: column; align-items: center; padding: 4px 2px 3px; cursor: pointer; border-radius: 2px; transition: border-color 0.1s, background 0.1s; position: relative;">
+						<span style="font-size:15px;line-height:1">🧹</span>
+						<span style="font-family:'Press Start 2P',monospace;font-size:5px;color:#ffcc00;margin-top:2px;text-align:center;line-height:1.3">
+							&nbsp;
+						</span>
+					</div>
+					<button class="btn btn-amber" id="btn-ed-clear">CLEAR</button>
+					
+					<div class="tg-cell" data-tid="18" title="[18] UPGRADE — Upgrades current weapon" style="border: 1px solid rgba(0, 229, 255, 0.333); background: rgba(0, 229, 255, 0.07); display: flex; flex-direction: column; align-items: center; padding: 4px 2px 3px; cursor: pointer; border-radius: 2px; transition: border-color 0.1s, background 0.1s; position: relative;">
+						<span style="font-size:15px;line-height:1">🎨</span>
+						<span style="font-family:'Press Start 2P',monospace;font-size:5px;color:#00e5ff;margin-top:2px;text-align:center;line-height:1.3">		&nbsp;
+						</span>
+					</div>
+					<button class="btn btn-cyan" id="btn-ed-fill">FILL FLOOR</button>
+				</div>
+			</div>
+		  <div id="tile-guide"></div>
+		</div>
+      </div>
+    </div>
+
+  </div><!-- /editor-toolbar -->
+
+  <!-- Full-width canvas -->
+  <div id="editor-canvas-wrap">
+    <canvas id="editorCanvas"></canvas>
+  </div>
+
+</div><!-- /screen-editor -->
+
+<!-- ════════════════════════════════════════════
+     CUSTOM CHARACTER MODAL
+     ════════════════════════════════════════════ -->
+<div id="char-modal-bg">
+  <div id="char-modal">
+    <h2 id="char-modal-title">◈ NEW CHARACTER</h2>
+
+    <div class="cf">
+      <label>NAME</label>
+      <input type="text" id="char-name" maxlength="12" placeholder="e.g. ROBOT" value="CUSTOM">
+    </div>
+
+    <div class="cf-row">
+      <div class="cf cf-half">
+        <label>BODY COLOR</label>
+        <input type="color" id="char-color" value="#cc4444">
+      </div>
+      <div class="cf cf-half">
+        <label>EYE COLOR</label>
+        <input type="color" id="char-eyecolor" value="#ff0000">
+      </div>
+    </div>
+
+    <div class="cf">
+      <label>BEHAVIOR</label>
+      <select id="char-behavior">
+        <option value="patrol">PATROL  (walks back &amp; forth)</option>
+        <option value="fast">FAST    (quick patrol)</option>
+        <option value="flying">FLYING  (hovers, no gravity)</option>
+        <option value="jumper">JUMPER  (bounces on platforms)</option>
+        <option value="sniper">SNIPER  (shoots at player)</option>
+      </select>
+    </div>
+
+    <div class="cf">
+      <label>SPEED &nbsp;<span class="rv" id="rv-speed">1.4</span></label>
+      <input type="range" id="char-speed" min="0.5" max="4" step="0.1" value="1.4">
+    </div>
+    <div class="cf">
+      <label>PATROL RANGE &nbsp;<span class="rv" id="rv-range">80</span>px</label>
+      <input type="range" id="char-range" min="32" max="300" step="8" value="80">
+    </div>
+    <div class="cf">
+      <label>SCORE VALUE &nbsp;<span class="rv" id="rv-score">300</span>pts</label>
+      <input type="range" id="char-score" min="100" max="1000" step="50" value="300">
+    </div>
+
+    <div class="char-prev-row">
+      <canvas class="char-prev-canvas" id="char-prev-cnv" width="48" height="56"></canvas>
+      <div id="char-prev-info"></div>
+    </div>
+
+    <div class="char-modal-btns">
+      <button class="ed-btn"             id="char-cancel">CANCEL</button>
+      <button class="ed-btn ed-btn-save" id="char-save">SAVE CHARACTER</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     LEADERBOARD SCREEN
+     ════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════
+     LEVEL IMPORT MODAL (Phase 4 — URL Sharing)
+     ════════════════════════════════════════════ -->
+<div id="import-level-modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;align-items:center;justify-content:center;">
+  <div style="background:#0d1117;border:2px solid #4a9eff;padding:24px;max-width:560px;width:90%;font-family:'Press Start 2P',monospace;color:#eee;">
+    <div style="font-size:10px;color:#4a9eff;margin-bottom:16px;letter-spacing:1px;">🔗 PLAY SHARED LEVEL</div>
+    <div style="font-size:8px;color:#aaa;margin-bottom:10px;line-height:1.8;">Paste the level code below.<br>You can paste the full URL or just the part after <span style="color:#4a9eff">#level=</span></div>
+    <textarea id="import-level-input" style="width:100%;height:90px;background:#070a0f;color:#4a9eff;border:1px solid #333;padding:8px;font-family:monospace;font-size:11px;resize:vertical;box-sizing:border-box;" placeholder="Paste URL or level code here..."></textarea>
+    <div style="margin-top:14px;display:flex;gap:10px;justify-content:flex-end;">
+      <button id="import-level-cancel" style="background:#222;color:#aaa;border:1px solid #444;padding:8px 14px;font-family:'Press Start 2P',monospace;font-size:8px;cursor:pointer;">CANCEL</button>
+      <button id="import-level-go"     style="background:#4a9eff;color:#000;border:none;padding:8px 14px;font-family:'Press Start 2P',monospace;font-size:8px;cursor:pointer;">▶ PLAY LEVEL</button>
+    </div>
+    <div id="import-level-error" style="font-size:7px;color:#ff4444;margin-top:10px;min-height:14px;"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     REPLAY IMPORT MODAL — paste a shared replay code
+     ════════════════════════════════════════════ -->
+<div id="import-replay-modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#0a0d14;border:2px solid #00e5ff;padding:24px;max-width:580px;width:92%;font-family:'Press Start 2P',monospace;color:#eee;box-sizing:border-box;">
+    <div style="font-size:10px;color:#00e5ff;margin-bottom:8px;letter-spacing:1px;">👁 WATCH SHARED REPLAY</div>
+    <div style="font-size:7px;color:#888;margin-bottom:14px;line-height:1.9;">
+      Paste a replay code shared by another player.<br>
+      The recording will play back from the start of their run.
+    </div>
+    <textarea id="import-replay-input" style="width:100%;height:100px;background:#070a0f;color:#00e5ff;border:1px solid #224;padding:8px;font-family:monospace;font-size:10px;resize:none;box-sizing:border-box;outline:none;" placeholder="Paste replay code here..."></textarea>
+    <div style="margin-top:12px;display:flex;gap:10px;justify-content:flex-end;">
+      <button id="import-replay-cancel" style="background:#111;color:#888;border:1px solid #333;padding:8px 14px;font-family:'Press Start 2P',monospace;font-size:7px;cursor:pointer;">CANCEL</button>
+      <button id="import-replay-go"     style="background:#00e5ff;color:#000;border:none;padding:8px 16px;font-family:'Press Start 2P',monospace;font-size:7px;cursor:pointer;font-weight:bold;">▶ WATCH REPLAY</button>
+    </div>
+    <div id="import-replay-error" style="font-size:7px;color:#ff4444;margin-top:8px;min-height:14px;"></div>
+  </div>
+</div>
+
+<div id="screen-leaderboard" class="screen">
+  <div class="lb-header">
+    <div class="lb-title">🏆 HIGH SCORES</div>
+    <div class="lb-subtitle">TOP 10 SOLDIERS</div>
+  </div>
+
+  <div class="lb-table-wrap">
+    <table class="lb-table">
+      <thead>
+        <tr>
+          <th class="lb-th">RANK</th>
+          <th class="lb-th">NAME</th>
+          <th class="lb-th">SCORE</th>
+          <th class="lb-th">DATE</th>
+        </tr>
+      </thead>
+      <tbody id="lb-tbody">
+        <!-- filled by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="lb-actions">
+    <button class="btn btn-amber" id="btn-lb-back">← MAIN MENU</button>
+    <button class="btn btn-danger btn-sm" id="btn-lb-clear">✕ CLEAR SCORES</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     LEVEL TRANSITION SCREEN
+     Shown between levels — animated corridor walk
+     ════════════════════════════════════════════ -->
+<div id="screen-transition" class="screen">
+  <div id="trans-wrap">
+    <div id="trans-header">
+      <span id="trans-level-from"></span>
+      <span id="trans-message"></span>
+      <span id="trans-level-to"></span>
+    </div>
+    <div id="trans-corridor-wrap">
+      <canvas id="trans-canvas" width="700" height="120"></canvas>
+    </div>
+    <div id="trans-footer">
+      <span id="trans-score-label">SCORE</span>
+      <span id="trans-score-val"></span>
+      <span id="trans-sub"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     GLOBAL FOOTER BAR — always visible
+     ════════════════════════════════════════════ -->
+<div id="footer-bar">
+  <div class="footer-left">
+    <a class="footer-link" href="admin.html" title="Open Config Admin">
+      <span class="footer-link-icon">⚙</span>
+      <span class="footer-link-text">CONFIG ADMIN</span>
+    </a>
+  </div>
+  <div class="footer-center">
+    <span class="footer-game-tag" id="footer-title"></span>
+    <span class="footer-game-tag-developer" id="footer-title-dev">&nbsp;&nbsp;z.kamali</span>
+  </div>
+  <div class="footer-right">
+    <button class="btn-fullscreen" id="btn-fullscreen" title="Toggle Fullscreen (F11)" aria-label="Toggle fullscreen">
+      <span class="fs-icon" id="fs-icon">⛶</span>
+      <span class="fs-label" id="fs-label">FULLSCREEN</span>
+    </button>
+  </div>
+</div>
+
+<!-- Scripts — levels data must load before the engine -->
+<script src="levels.js"></script>
+<script src="game.js"></script>
+
+</body>
+</html>

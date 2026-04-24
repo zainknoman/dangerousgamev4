@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  
+  <title>DANGEROUS GAME — CONFIG ADMIN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="shell">
+
+<!-- ══ TOP BAR ══════════════════════════════════════════════════ -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">⚙</div>
+    <div class="logo-text">
+      <div class="logo-title">CONFIG ADMIN</div>
+      <div class="logo-sub">DANGEROUS GAME — GAME CONFIGURATION</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="status-pill">
+      <div class="status-dot"></div>
+      <span>CONFIG LOADED</span>
+    </div>
+    <div class="version-tag" id="version-tag">v2.0</div>
+    <button class="btn" id="btn-fullscreen-admin" title="Toggle Fullscreen (F11)">⛶ FULLSCREEN</button>
+    <a href="index.html" class="btn">◀ BACK TO GAME</a>
+  </div>
+</div>
+
+<!-- ══ SAVE BAR ═════════════════════════════════════════════════ -->
+<div class="savebar">
+  <div class="savebar-label">◈ OPERATIONS</div>
+  <div class="change-counter" id="change-counter">NO CHANGES</div>
+  <button class="btn btn-amber" onclick="applyChanges()">⬆ APPLY CHANGES</button>
+  <button class="btn btn-cyan"  onclick="exportConfig()">↓ EXPORT JSON</button>
+  <button class="btn btn-cyan"  onclick="copyConfig()">⧉ COPY JSON</button>
+  <button class="btn btn-red"   onclick="resetConfig()">↺ RESET ALL</button>
+  <label class="btn btn-import-label">
+    ↑ IMPORT JSON
+    <input class="admin-file-input" type="file" id="import-file" accept=".json" onchange="importConfig(event)">
+  </label>
+</div>
+
+<!-- ══ TABS ═════════════════════════════════════════════════════ -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('game',this)"><span class="tab-icon">🎮</span>GAME</button>
+  <button class="tab" onclick="switchTab('player',this)"><span class="tab-icon">🧍</span>PLAYER</button>
+  <button class="tab" onclick="switchTab('enemies',this)"><span class="tab-icon">👾</span>ENEMIES</button>
+  <button class="tab" onclick="switchTab('weapons',this)"><span class="tab-icon">🔫</span>WEAPONS</button>
+  <button class="tab" onclick="switchTab('scoring',this)"><span class="tab-icon">⭐</span>SCORING</button>
+  <button class="tab" onclick="switchTab('levels',this)"><span class="tab-icon">🗺️</span>LEVELS</button>
+  <button class="tab" onclick="switchTab('audio',this)"><span class="tab-icon">🔊</span>AUDIO</button>
+  <button class="tab" onclick="switchTab('ui',this)"><span class="tab-icon">🖥️</span>UI</button>
+  <button class="tab" onclick="switchTab('json',this)"><span class="tab-icon">{ }</span>JSON</button>
+  <button class="tab" onclick="switchTab('diff',this)"><span class="tab-icon">Δ</span>CHANGES</button>
+  <button class="tab" onclick="switchTab('themes',this)"><span class="tab-icon">🎨</span>THEMES</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB: GAME
+══════════════════════════════════════════════════════════════════ -->
+<div id="tab-game" class="tab-panel active">
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">GAME IDENTITY</div>
+      <div class="section-badge">game.*</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid">
+        <div class="field">
+          <div class="field-label">TITLE<span contenteditable="false" class="field-path">game.title</span></div>
+          <input type="text" data-path="game.title" oninput="fieldChanged(this)" readonly>
+        </div>
+        <div class="field">
+          <div class="field-label">SUBTITLE<span class="field-path">game.subtitle</span></div>
+          <input type="text" data-path="game.subtitle" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">VERSION<span class="field-path">game.version</span></div>
+          <input type="text" data-path="game.version" oninput="fieldChanged(this)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">CANVAS SETTINGS</div>
+      <div class="section-badge">game.canvas.*</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid field-grid-3">
+        <div class="field">
+          <div class="field-label">WIDTH (px)<span class="field-path">game.canvas.width</span></div>
+          <div class="field-row">
+            <input type="number" data-path="game.canvas.width" min="400" max="1920" oninput="fieldChanged(this)">
+            <span class="field-unit">px</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">HEIGHT (px)<span class="field-path">game.canvas.height</span></div>
+          <div class="field-row">
+            <input type="number" data-path="game.canvas.height" min="200" max="600" oninput="fieldChanged(this)">
+            <span class="field-unit">px</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">TILE SIZE<span class="field-path">game.canvas.tileSize</span></div>
+          <div class="field-row">
+            <input type="number" data-path="game.canvas.tileSize" min="16" max="64" step="8" oninput="fieldChanged(this)">
+            <span class="field-unit">px</span>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">PIXEL RENDERING<span class="field-path">game.canvas.pixelated</span></div>
+          <label class="toggle-wrap">
+            <span class="toggle-label">Pixelated (crisp edges)</span>
+            <label class="toggle-switch">
+              <input type="checkbox" data-path="game.canvas.pixelated" onchange="fieldChanged(this)">
+              <div class="toggle-slider"></div>
+            </label>
+          </label>
+        </div>
+        <div class="field">
+          <div class="field-label">CRT EFFECT<span class="field-path">game.canvas.crtEffect</span></div>
+          <label class="toggle-wrap">
+            <span class="toggle-label">CRT scanline overlay</span>
+            <label class="toggle-switch">
+              <input type="checkbox" data-path="game.canvas.crtEffect" onchange="fieldChanged(this)">
+              <div class="toggle-slider"></div>
+            </label>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">CHEAT CODES</div>
+      <div class="section-badge">cheatCodes.*</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid">
+        <div class="field">
+          <div class="field-label">ENABLE CHEATS<span class="field-path">cheatCodes.enabled</span></div>
+          <label class="toggle-wrap">
+            <span class="toggle-label">Allow cheat code input</span>
+            <label class="toggle-switch">
+              <input type="checkbox" data-path="cheatCodes.enabled" onchange="fieldChanged(this)">
+              <div class="toggle-slider"></div>
+            </label>
+          </label>
+        </div>
+        <div class="field">
+          <div class="field-label">GOD MODE CODE<span class="field-path">cheatCodes.codes.IDDQD</span></div>
+          <input type="text" data-path="cheatCodes.codes.IDDQD" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">ALL WEAPONS CODE<span class="field-path">cheatCodes.codes.IDKFA</span></div>
+          <input type="text" data-path="cheatCodes.codes.IDKFA" oninput="fieldChanged(this)">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB: PLAYER
+══════════════════════════════════════════════════════════════════ -->
+<div id="tab-player" class="tab-panel">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">IDENTITY</div>
+      <div class="section-badge">player.*</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid">
+        <div class="field">
+          <div class="field-label">NAME<span class="field-path">player.name</span></div>
+          <input type="text" data-path="player.name" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">START LIVES<span class="field-path">player.startLives</span></div>
+          <input type="number" data-path="player.startLives" min="1" max="9" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">MAX LIVES<span class="field-path">player.maxLives</span></div>
+          <input type="number" data-path="player.maxLives" min="1" max="99" oninput="fieldChanged(this)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">HITBOX</div>
+      <div class="section-badge">player.width / height</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid field-grid-3">
+        <div class="field">
+          <div class="field-label">WIDTH<span class="field-path">player.width</span></div>
+          <div class="field-row"><input type="number" data-path="player.width" min="4" max="64" oninput="fieldChanged(this)"><span class="field-unit">px</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">HEIGHT<span class="field-path">player.height</span></div>
+          <div class="field-row"><input type="number" data-path="player.height" min="4" max="128" oninput="fieldChanged(this)"><span class="field-unit">px</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">MOVEMENT</div>
+      <div class="section-badge">player.walk / run / jump / gravity</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid">
+        <div class="field">
+          <div class="field-label">WALK SPEED<span class="field-path">player.walkSpeed</span></div>
+          <div class="field-row"><input type="number" data-path="player.walkSpeed" step="0.1" min="0.5" max="10" oninput="fieldChanged(this)"><span class="field-unit">px/f</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">RUN SPEED<span class="field-path">player.runSpeed</span></div>
+          <div class="field-row"><input type="number" data-path="player.runSpeed" step="0.1" min="1" max="15" oninput="fieldChanged(this)"><span class="field-unit">px/f</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">JUMP FORCE<span class="field-path">player.jumpForce</span></div>
+          <div class="field-row"><input type="number" data-path="player.jumpForce" step="0.5" min="-25" max="-1" oninput="fieldChanged(this)"><span class="field-unit">vy</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">GRAVITY<span class="field-path">player.gravity</span></div>
+          <div class="field-row"><input type="number" data-path="player.gravity" step="0.01" min="0.05" max="2" oninput="fieldChanged(this)"><span class="field-unit">acc</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">MAX FALL SPEED<span class="field-path">player.maxFallSpeed</span></div>
+          <div class="field-row"><input type="number" data-path="player.maxFallSpeed" step="0.5" min="1" max="30" oninput="fieldChanged(this)"><span class="field-unit">px/f</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">INVINC. FRAMES<span class="field-path">player.invincibilityFrames</span></div>
+          <div class="field-row"><input type="number" data-path="player.invincibilityFrames" min="0" max="600" oninput="fieldChanged(this)"><span class="field-unit">f</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">JETPACK</div>
+      <div class="section-badge">player.jetpack*</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid">
+        <div class="field">
+          <div class="field-label">FUEL CAPACITY<span class="field-path">player.jetpackFuel</span></div>
+          <input type="number" data-path="player.jetpackFuel" min="10" max="500" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">FUEL REGEN /f<span class="field-path">player.jetpackFuelRegen</span></div>
+          <input type="number" data-path="player.jetpackFuelRegen" step="0.05" min="0" max="5" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">LIFT FORCE<span class="field-path">player.jetpackLift</span></div>
+          <div class="field-row"><input type="number" data-path="player.jetpackLift" step="0.1" min="-10" max="-0.5" oninput="fieldChanged(this)"><span class="field-unit">vy</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">GRENADES</div>
+      <div class="section-badge">player.grenade*</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid">
+        <div class="field">
+          <div class="field-label">THROW SPEED<span class="field-path">player.grenadeThrowSpeed</span></div>
+          <input type="number" data-path="player.grenadeThrowSpeed" step="0.5" min="1" max="20" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">GRAVITY<span class="field-path">player.grenadeGravity</span></div>
+          <input type="number" data-path="player.grenadeGravity" step="0.05" min="0.1" max="2" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">FUSE (frames)<span class="field-path">player.grenadeFuse</span></div>
+          <div class="field-row"><input type="number" data-path="player.grenadeFuse" min="10" max="300" oninput="fieldChanged(this)"><span class="field-unit">f</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">ANIMATION</div>
+      <div class="section-badge">player.frameRate / animFrames</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid field-grid-3">
+        <div class="field">
+          <div class="field-label">FRAME RATE<span class="field-path">player.frameRate</span></div>
+          <input type="number" data-path="player.frameRate" min="1" max="30" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">ANIM FRAMES<span class="field-path">player.animFrames</span></div>
+          <input type="number" data-path="player.animFrames" min="1" max="16" oninput="fieldChanged(this)">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB: ENEMIES
+══════════════════════════════════════════════════════════════════ -->
+<div id="tab-enemies" class="tab-panel">
+  <div class="enemy-grid" id="enemy-grid">
+    <!-- rendered by admin.js -->
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB: WEAPONS
+══════════════════════════════════════════════════════════════════ -->
+<div id="tab-weapons" class="tab-panel">
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">🔫 PISTOL</div>
+      <div class="section-badge">weapons.pistol.*</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid">
+        <div class="field">
+          <div class="field-label">BULLET SPEED<span class="field-path">weapons.pistol.bulletSpeed</span></div>
+          <div class="field-row"><input type="number" data-path="weapons.pistol.bulletSpeed" step="0.5" min="1" max="30" oninput="fieldChanged(this)"><span class="field-unit">px/f</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">SHOOT COOLDOWN<span class="field-path">weapons.pistol.shootCooldown</span></div>
+          <div class="field-row"><input type="number" data-path="weapons.pistol.shootCooldown" min="1" max="60" oninput="fieldChanged(this)"><span class="field-unit">f</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">AMMO (-1=∞)<span class="field-path">weapons.pistol.ammo</span></div>
+          <input type="number" data-path="weapons.pistol.ammo" min="-1" max="999" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">DAMAGE<span class="field-path">weapons.pistol.damage</span></div>
+          <input type="number" data-path="weapons.pistol.damage" min="1" max="10" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">BULLET COLOR<span class="field-path">weapons.pistol.bulletColor</span></div>
+          <div class="color-field">
+            <div class="color-preview" id="prev-pistol-bulletColor"></div>
+            <input type="color" data-path="weapons.pistol.bulletColor" oninput="fieldChanged(this);updateColorPreview(this)">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">🔥 MACHINE GUN</div>
+      <div class="section-badge">weapons.machineGun.*</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid">
+        <div class="field">
+          <div class="field-label">BULLET SPEED<span class="field-path">weapons.machineGun.bulletSpeed</span></div>
+          <div class="field-row"><input type="number" data-path="weapons.machineGun.bulletSpeed" step="0.5" min="1" max="30" oninput="fieldChanged(this)"><span class="field-unit">px/f</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">SHOOT COOLDOWN<span class="field-path">weapons.machineGun.shootCooldown</span></div>
+          <div class="field-row"><input type="number" data-path="weapons.machineGun.shootCooldown" min="1" max="60" oninput="fieldChanged(this)"><span class="field-unit">f</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">AMMO<span class="field-path">weapons.machineGun.ammo</span></div>
+          <input type="number" data-path="weapons.machineGun.ammo" min="1" max="500" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">DAMAGE<span class="field-path">weapons.machineGun.damage</span></div>
+          <input type="number" data-path="weapons.machineGun.damage" min="1" max="10" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">BULLET COLOR<span class="field-path">weapons.machineGun.bulletColor</span></div>
+          <div class="color-field">
+            <div class="color-preview" id="prev-machineGun-bulletColor"></div>
+            <input type="color" data-path="weapons.machineGun.bulletColor" oninput="fieldChanged(this);updateColorPreview(this)">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">💣 GRENADE</div>
+      <div class="section-badge">weapons.grenade.*</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid">
+        <div class="field">
+          <div class="field-label">THROW SPEED<span class="field-path">weapons.grenade.throwSpeed</span></div>
+          <input type="number" data-path="weapons.grenade.throwSpeed" step="0.5" min="1" max="20" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">GRAVITY<span class="field-path">weapons.grenade.gravity</span></div>
+          <input type="number" data-path="weapons.grenade.gravity" step="0.05" min="0.05" max="2" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">FUSE (frames)<span class="field-path">weapons.grenade.fuse</span></div>
+          <input type="number" data-path="weapons.grenade.fuse" min="10" max="300" oninput="fieldChanged(this)">
+        </div>
+        <div class="field">
+          <div class="field-label">BLAST RADIUS<span class="field-path">weapons.grenade.blastRadius</span></div>
+          <div class="field-row"><input type="number" data-path="weapons.grenade.blastRadius" min="10" max="400" oninput="fieldChanged(this)"><span class="field-unit">px</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">AMMO PER PICKUP<span class="field-path">weapons.grenade.ammo</span></div>
+          <input type="number" data-path="weapons.grenade.ammo" min="1" max="20" oninput="fieldChanged(this)">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB: SCORING
+══════════════════════════════════════════════════════════════════ -->
+<div id="tab-scoring" class="tab-panel">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">POINTS TABLE</div>
+      <div class="section-badge">scoring.*</div>
+    </div>
+    <div class="section-body">
+      <table class="score-table">
+        <thead>
+          <tr>
+            <th>EVENT</th>
+            <th>KEY PATH</th>
+            <th>POINTS</th>
+          </tr>
+        </thead>
+        <tbody id="score-tbody">
+          <!-- rendered by admin.js -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB: LEVELS
+══════════════════════════════════════════════════════════════════ -->
+<div id="tab-levels" class="tab-panel">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">LEVEL METADATA</div>
+      <div class="section-badge">levels[ ].*</div>
+    </div>
+    <div class="section-body" id="levels-body">
+      <!-- rendered by admin.js -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB: AUDIO
+══════════════════════════════════════════════════════════════════ -->
+<div id="tab-audio" class="tab-panel">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">GLOBAL AUDIO</div>
+      <div class="section-badge">audio.enabled</div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <div class="field-label">AUDIO ENABLED<span class="field-path">audio.enabled</span></div>
+        <label class="toggle-wrap">
+          <span class="toggle-label">Enable all game sound effects</span>
+          <label class="toggle-switch">
+            <input type="checkbox" data-path="audio.enabled" onchange="fieldChanged(this)">
+            <div class="toggle-slider"></div>
+          </label>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">SFX PROPERTIES</div>
+      <div class="section-badge">audio.sfx.*</div>
+    </div>
+    <div class="section-body">
+      <table class="sfx-table">
+        <thead>
+          <tr>
+            <th>EVENT</th>
+            <th>FREQ (Hz)</th>
+            <th>DURATION (s)</th>
+            <th>WAVEFORM</th>
+            <th>VOLUME</th>
+            <th>TEST</th>
+          </tr>
+        </thead>
+        <tbody id="sfx-tbody">
+          <!-- rendered by admin.js -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB: UI
+══════════════════════════════════════════════════════════════════ -->
+<div id="tab-ui" class="tab-panel">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">LAYOUT</div>
+      <div class="section-badge">ui.hudHeight / msgDuration</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid field-grid-3">
+        <div class="field">
+          <div class="field-label">HUD HEIGHT<span class="field-path">ui.hudHeight</span></div>
+          <div class="field-row"><input type="number" data-path="ui.hudHeight" min="20" max="100" oninput="fieldChanged(this)"><span class="field-unit">px</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">MSG DURATION<span class="field-path">ui.msgDuration</span></div>
+          <div class="field-row"><input type="number" data-path="ui.msgDuration" min="10" max="300" oninput="fieldChanged(this)"><span class="field-unit">f</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">FONT SIZES</div>
+      <div class="section-badge">ui.fontSize.*</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid field-grid-3">
+        <div class="field"><div class="field-label">TITLE<span class="field-path">ui.fontSize.title</span></div><input type="number" data-path="ui.fontSize.title" min="8" max="72" oninput="fieldChanged(this)"></div>
+        <div class="field"><div class="field-label">HUD<span class="field-path">ui.fontSize.hud</span></div><input type="number" data-path="ui.fontSize.hud" min="6" max="24" oninput="fieldChanged(this)"></div>
+        <div class="field"><div class="field-label">MESSAGE<span class="field-path">ui.fontSize.msg</span></div><input type="number" data-path="ui.fontSize.msg" min="6" max="48" oninput="fieldChanged(this)"></div>
+        <div class="field"><div class="field-label">TINY<span class="field-path">ui.fontSize.tiny</span></div><input type="number" data-path="ui.fontSize.tiny" min="4" max="18" oninput="fieldChanged(this)"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">COLOR PALETTE</div>
+      <div class="section-badge">ui.colors.*</div>
+    </div>
+    <div class="section-body">
+      <div class="field-grid field-grid-3" id="ui-colors-grid">
+        <!-- rendered by admin.js -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB: JSON RAW
+══════════════════════════════════════════════════════════════════ -->
+<div id="tab-json" class="tab-panel">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">RAW JSON EDITOR</div>
+      <div class="section-badge">Direct config.json editing</div>
+    </div>
+    <div class="section-body json-viewer">
+      <div class="json-actions">
+        <span>Edit directly — click APPLY to sync to all fields</span>
+        <button class="btn btn-amber" onclick="syncFromJson()">⬆ SYNC FROM JSON</button>
+        <button class="btn" onclick="formatJson()">⟳ FORMAT</button>
+        <button class="btn btn-cyan" onclick="copyConfig()">⧉ COPY</button>
+      </div>
+      <textarea id="json-raw" spellcheck="false" oninput="onJsonEdit()"></textarea>
+      <div class="json-error" id="json-error"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB: DIFF / CHANGES
+══════════════════════════════════════════════════════════════════ -->
+<div id="tab-diff" class="tab-panel">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Δ CHANGE LOG</div>
+      <div class="section-badge" id="diff-count-badge">0 changes</div>
+    </div>
+    <div class="section-body section-body-flush">
+      <div class="diff-header-row">
+        <span>KEY PATH</span>
+        <span>ORIGINAL</span>
+        <span>NEW VALUE</span>
+      </div>
+      <div class="diff-list" id="diff-list">
+        <div class="diff-empty">NO CHANGES YET — MODIFY ANY FIELD TO SEE DIFFS HERE</div>
+      </div>
+    </div>
+  </div>
+  <div class="diff-actions">
+    <button class="btn btn-amber" onclick="applyChanges()">⬆ APPLY ALL CHANGES</button>
+    <button class="btn btn-red"   onclick="revertAll()">↺ REVERT ALL</button>
+  </div>
+</div>
+
+</div><!-- /shell -->
+
+<!-- ════════════════════════════════════════════
+     PHASE 3 — FEAT-011: THEMES TAB PANEL
+     ════════════════════════════════════════════ -->
+<div id="tab-themes" class="tab-panel" style="padding:20px;">
+
+  <div class="section" style="margin-bottom:20px;">
+    <div class="section-header">
+      <div class="section-title">🎨 VISUAL THEME PACKS</div>
+    </div>
+    <div class="section-body">
+      <p style="font-size:8px;color:#888;line-height:1.9;margin-bottom:16px;">
+        Swap the entire visual palette in one click. Theme changes the tile colors,
+        background, CRT tint, and enemy tints. Changes apply live in-game instantly.
+      </p>
+      <div id="theme-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">ACTIVE THEME</div>
+    </div>
+    <div class="section-body">
+      <div id="active-theme-display" style="font-size:10px;color:var(--accent);padding:8px 0;"></div>
+      <button class="btn btn-amber" onclick="adminApplyTheme('default')" style="margin-top:8px;">↺ RESET TO DEFAULT</button>
+    </div>
+  </div>
+
+</div>
+<!-- /themes panel -->
+
+<!-- Toast container -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- Fullscreen button wiring — inline-free, handled in admin.js -->
+<script src="admin.js"></script>
+
+</body>
+</html>
