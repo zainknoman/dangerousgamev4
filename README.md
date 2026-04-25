@@ -153,7 +153,6 @@ dangerousgameV4.0/
 
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** — Internal engine architecture, data flow, module breakdown
 - **[ONBOARDING.md](ONBOARDING.md)** — Developer guide: modifying players, tiles, enemies, levels
-- **[TILE_DICTIONARY.md](TILE_DICTIONARY.md)** — Complete reference of all tile IDs, behaviors, and colors
 
 ---
 
